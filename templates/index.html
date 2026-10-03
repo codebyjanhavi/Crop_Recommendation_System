@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Crop Recommendation System</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+    <!-- ==========================================
+         HEADER
+    =========================================== -->
+
+    <header class="header">
+
+        <div class="plant-icon">
+            🌱
+        </div>
+
+        <div class="header-content">
+
+            <h1>Crop Recommendation System</h1>
+
+            <p>
+                Get a suitable crop recommendation based on
+                soil and weather conditions.
+            </p>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- ==========================================
+         MAIN CARD
+    =========================================== -->
+
+    <div class="card">
+
+        <h2>Enter Agricultural Parameters</h2>
+
+        <p class="instruction">
+            Enter the soil and environmental values to get a crop recommendation.
+        </p>
+
+
+        <!-- ==========================================
+             FORM
+        =========================================== -->
+
+        <form id="predictionForm">
+
+
+            <!-- ==========================================
+                 INPUT FIELDS
+            =========================================== -->
+
+            <div class="input-grid">
+
+
+                <!-- Nitrogen -->
+
+                <div class="input-group">
+
+                    <label for="N">
+                        Nitrogen (N)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="N"
+                        name="N"
+                        step="any"
+                        min="0"
+                        max="140"
+                        required
+                        placeholder="Enter nitrogen value"
+                    >
+
+                </div>
+
+
+                <!-- Phosphorus -->
+
+                <div class="input-group">
+
+                    <label for="P">
+                        Phosphorus (P)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="P"
+                        name="P"
+                        step="any"
+                        min="5"
+                        max="145"
+                        required
+                        placeholder="Enter phosphorus value"
+                    >
+
+                </div>
+
+
+                <!-- Potassium -->
+
+                <div class="input-group">
+
+                    <label for="K">
+                        Potassium (K)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="K"
+                        name="K"
+                        step="any"
+                        min="5"
+                        max="205"
+                        required
+                        placeholder="Enter potassium value"
+                    >
+
+                </div>
+
+
+                <!-- Temperature -->
+
+                <div class="input-group">
+
+                    <label for="temperature">
+                        Temperature (°C)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="temperature"
+                        name="temperature"
+                        step="any"
+                        min="8.82"
+                        max="43.68"
+                        required
+                        placeholder="Enter temperature"
+                    >
+
+                </div>
+
+
+                <!-- Humidity -->
+
+                <div class="input-group">
+
+                    <label for="humidity">
+                        Humidity (%)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="humidity"
+                        name="humidity"
+                        step="any"
+                        min="14.25"
+                        max="99.98"
+                        required
+                        placeholder="Enter humidity"
+                    >
+
+                </div>
+
+
+                <!-- Soil pH -->
+
+                <div class="input-group">
+
+                    <label for="ph">
+                        Soil pH
+                    </label>
+
+                    <input
+                        type="number"
+                        id="ph"
+                        name="ph"
+                        step="any"
+                        min="3.50"
+                        max="9.94"
+                        required
+                        placeholder="Enter soil pH"
+                    >
+
+                </div>
+
+
+                <!-- Rainfall -->
+
+                <div class="input-group">
+
+                    <label for="rainfall">
+                        Rainfall (mm)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="rainfall"
+                        name="rainfall"
+                        step="any"
+                        min="20.21"
+                        max="298.56"
+                        required
+                        placeholder="Enter rainfall"
+                    >
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ==========================================
+                 BUTTONS
+            =========================================== -->
+
+            <div class="buttons">
+
+                <button
+                    type="submit"
+                    class="recommend-btn"
+                    id="recommendBtn"
+                >
+                    🌾 Recommend Crop
+                </button>
+
+                <button
+                    type="button"
+                    class="clear-btn"
+                    id="clearBtn"
+                >
+                    Clear
+                </button>
+
+            </div>
+
+
+
+            <!-- ==========================================
+                 PREDICTION RESULT
+            =========================================== -->
+
+            <div
+                id="result"
+                class="result hidden"
+            >
+            </div>
+
+
+
+            <!-- ==========================================
+                 INPUT RANGE GUIDE
+            =========================================== -->
+
+            <div class="range-guide">
+
+                <div class="range-guide-header">
+
+                    <span class="range-icon">
+                        💡
+                    </span>
+
+                    <div>
+
+                        <h3>
+                            Input Range Guide
+                        </h3>
+
+                        <p>
+                            Enter values within the ranges of
+                            the dataset used to train the model.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="range-grid">
+
+
+                    <div class="range-item">
+
+                        <span>
+                            Nitrogen (N)
+                        </span>
+
+                        <strong>
+                            0 – 140
+                        </strong>
+
+                    </div>
+
+
+                    <div class="range-item">
+
+                        <span>
+                            Phosphorus (P)
+                        </span>
+
+                        <strong>
+                            5 – 145
+                        </strong>
+
+                    </div>
+
+
+                    <div class="range-item">
+
+                        <span>
+                            Potassium (K)
+                        </span>
+
+                        <strong>
+                            5 – 205
+                        </strong>
+
+                    </div>
+
+
+                    <div class="range-item">
+
+                        <span>
+                            Temperature
+                        </span>
+
+                        <strong>
+                            8.82 – 43.68 °C
+                        </strong>
+
+                    </div>
+
+
+                    <div class="range-item">
+
+                        <span>
+                            Humidity
+                        </span>
+
+                        <strong>
+                            14.25 – 99.98 %
+                        </strong>
+
+                    </div>
+
+
+                    <div class="range-item">
+
+                        <span>
+                            Soil pH
+                        </span>
+
+                        <strong>
+                            3.50 – 9.94
+                        </strong>
+
+                    </div>
+
+
+                    <div class="range-item">
+
+                        <span>
+                            Rainfall
+                        </span>
+
+                        <strong>
+                            20.21 – 298.56 mm
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+        </form>
+
+
+        <!-- ==========================================
+             LOADING
+        =========================================== -->
+
+        <div
+            id="loading"
+            class="loading hidden"
+        >
+
+            <div class="spinner"></div>
+
+            <p>
+                Analyzing soil and weather conditions...
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- ==========================================
+         INFORMATION CARDS
+    =========================================== -->
+
+    <div class="info-section">
+
+
+        <!-- Soil -->
+
+        <div class="info-card">
+
+            <div class="info-icon">
+                🌱
+            </div>
+
+            <h3>
+                Soil Parameters
+            </h3>
+
+            <p>
+                Nitrogen, phosphorus, potassium and
+                soil pH are used to analyze soil conditions.
+            </p>
+
+        </div>
+
+
+        <!-- Weather -->
+
+        <div class="info-card">
+
+            <div class="info-icon">
+                🌤️
+            </div>
+
+            <h3>
+                Weather Parameters
+            </h3>
+
+            <p>
+                Temperature, humidity and rainfall
+                are used as environmental features.
+            </p>
+
+        </div>
+
+
+        <!-- Machine Learning -->
+
+        <div class="info-card">
+
+            <div class="info-icon">
+                🤖
+            </div>
+
+            <h3>
+                Machine Learning
+            </h3>
+
+            <p>
+                A trained Random Forest model generates
+                the crop recommendation.
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- ==========================================
+         FOOTER
+    =========================================== -->
+
+    <footer class="footer">
+
+        <p>
+            Crop Recommendation System |
+            Machine Learning Project
+        </p>
+
+    </footer>
+
+
+</div>
+
+
+
+<!-- ==========================================
+     JAVASCRIPT
+=========================================== -->
+
+<script>
+
+
+    // ==========================================
+    // GET HTML ELEMENTS
+    // ==========================================
+
+    const form =
+        document.getElementById("predictionForm");
+
+    const result =
+        document.getElementById("result");
+
+    const loading =
+        document.getElementById("loading");
+
+    const clearBtn =
+        document.getElementById("clearBtn");
+
+    const recommendBtn =
+        document.getElementById("recommendBtn");
+
+
+
+    // ==========================================
+    // RECOMMEND CROP
+    // ==========================================
+
+    form.addEventListener(
+        "submit",
+        async function(event) {
+
+            // Stop normal form submission
+            event.preventDefault();
+
+
+            // Hide old result
+            result.classList.add("hidden");
+
+
+            // Show loading
+            loading.classList.remove("hidden");
+
+
+            // Disable button
+            recommendBtn.disabled = true;
+
+            recommendBtn.innerHTML =
+                "⏳ Analyzing...";
+
+
+            // ==========================================
+            // COLLECT INPUT VALUES
+            // ==========================================
+
+            const data = {
+
+                N:
+                    document.getElementById("N").value,
+
+                P:
+                    document.getElementById("P").value,
+
+                K:
+                    document.getElementById("K").value,
+
+                temperature:
+                    document.getElementById("temperature").value,
+
+                humidity:
+                    document.getElementById("humidity").value,
+
+                ph:
+                    document.getElementById("ph").value,
+
+                rainfall:
+                    document.getElementById("rainfall").value
+
+            };
+
+
+            try {
+
+
+                // ==========================================
+                // SEND DATA TO FLASK
+                // ==========================================
+
+                const response =
+                    await fetch(
+                        "/predict",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body:
+                                JSON.stringify(data)
+                        }
+                    );
+
+
+                // Convert response to JSON
+
+                const prediction =
+                    await response.json();
+
+
+                // Hide loading
+
+                loading.classList.add("hidden");
+
+
+
+                // ==========================================
+                // HANDLE ERROR
+                // ==========================================
+
+                if (
+                    !response.ok ||
+                    prediction.error
+                ) {
+
+                    result.className =
+                        "result error";
+
+                    result.innerHTML = `
+
+                        <div class="result-icon">
+                            ⚠️
+                        </div>
+
+                        <h3>
+                            Prediction Error
+                        </h3>
+
+                        <p>
+                            ${
+                                prediction.error ||
+                                "Something went wrong."
+                            }
+                        </p>
+
+                    `;
+
+                }
+
+
+
+                // ==========================================
+                // HANDLE SUCCESS
+                // ==========================================
+
+                else {
+
+                    result.className =
+                        "result success";
+
+                    result.innerHTML = `
+
+                        <div class="result-icon">
+                            🌱
+                        </div>
+
+                        <h3>
+                            Recommended Crop
+                        </h3>
+
+                        <div class="crop-name">
+                            ${prediction.crop}
+                        </div>
+
+                        <div class="confidence">
+
+                            <span>
+                                Model Confidence
+                            </span>
+
+                            <strong>
+                                ${prediction.confidence}%
+                            </strong>
+
+                        </div>
+
+                    `;
+
+                }
+
+
+                // Show result
+
+                result.classList.remove("hidden");
+
+
+            }
+
+
+            // ==========================================
+            // CONNECTION ERROR
+            // ==========================================
+
+            catch (error) {
+
+                loading.classList.add("hidden");
+
+
+                result.className =
+                    "result error";
+
+
+                result.innerHTML = `
+
+                    <div class="result-icon">
+                        ⚠️
+                    </div>
+
+                    <h3>
+                        Connection Error
+                    </h3>
+
+                    <p>
+                        Unable to connect to
+                        the Flask server.
+                    </p>
+
+                `;
+
+
+                result.classList.remove(
+                    "hidden"
+                );
+
+            }
+
+
+            // Enable button again
+
+            recommendBtn.disabled = false;
+
+            recommendBtn.innerHTML =
+                "🌾 Recommend Crop";
+
+        }
+    );
+
+
+
+    // ==========================================
+    // CLEAR BUTTON
+    // ==========================================
+
+    clearBtn.addEventListener(
+        "click",
+        function() {
+
+            // Clear all inputs
+
+            form.reset();
+
+
+            // Hide result
+
+            result.classList.add(
+                "hidden"
+            );
+
+
+            // Hide loading
+
+            loading.classList.add(
+                "hidden"
+            );
+
+
+            // Reset button
+
+            recommendBtn.disabled =
+                false;
+
+            recommendBtn.innerHTML =
+                "🌾 Recommend Crop";
+
+        }
+    );
+
+</script>
+
+
+</body>
+
+</html>
