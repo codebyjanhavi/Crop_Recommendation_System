@@ -1,0 +1,8 @@
+{
+    "Random Forest": 99.55,
+    "Decision Tree": 97.95,
+    "SVM": 98.41,
+    "KNN": 97.95,
+    "Logistic Regression": 97.27,
+    "Naive Bayes": 99.55
+}

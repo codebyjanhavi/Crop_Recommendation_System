@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 import joblib
 import numpy as np
-
+import json
 
 # ==========================================
 # 1. Create Flask application
@@ -22,6 +22,15 @@ label_encoder = joblib.load(
     "models/label_encoder.pkl"
 )
 
+# Load model comparison results
+
+with open(
+    "model_comparison.json",
+    "r"
+) as file:
+
+    model_comparison = json.load(file)
+
 print("Model loaded successfully!")
 print("Label encoder loaded successfully!")
 
@@ -29,8 +38,6 @@ print("Label encoder loaded successfully!")
 # ==========================================
 # 3. Training dataset ranges
 # ==========================================
-# These ranges are based on the values present
-# in the Crop Recommendation dataset.
 
 FEATURE_RANGES = {
 
@@ -49,6 +56,44 @@ FEATURE_RANGES = {
     "rainfall": (20.21, 298.56)
 }
 
+# ==========================================
+# Feature importance
+# ==========================================
+
+FEATURE_NAMES = [
+    "Nitrogen",
+    "Phosphorus",
+    "Potassium",
+    "Temperature",
+    "Humidity",
+    "Soil pH",
+    "Rainfall"
+]
+
+
+feature_importance = []
+
+for name, importance in zip(
+    FEATURE_NAMES,
+    model.feature_importances_
+):
+
+    feature_importance.append({
+
+        "feature": name,
+
+        "importance": round(
+            float(importance) * 100,
+            2
+        )
+
+    })
+
+
+feature_importance.sort(
+    key=lambda x: x["importance"],
+    reverse=True
+)
 
 # ==========================================
 # 4. Home route
@@ -106,8 +151,7 @@ def predict():
             if field not in data:
 
                 return jsonify({
-                    "error":
-                    f"Missing input field: {field}"
+                    "error": f"Missing input field: {field}"
                 }), 400
 
 
@@ -126,8 +170,7 @@ def predict():
             except (ValueError, TypeError):
 
                 return jsonify({
-                    "error":
-                    f"{field} must be a valid number."
+                    "error": f"{field} must be a valid number."
                 }), 400
 
 
@@ -140,7 +183,6 @@ def predict():
             value = values[field]
 
             minimum, maximum = FEATURE_RANGES[field]
-
 
             if value < minimum or value > maximum:
 
@@ -188,15 +230,61 @@ def predict():
 
 
         # ------------------------------------------
-        # Calculate model confidence
+        # Calculate prediction probabilities
         # ------------------------------------------
 
         probabilities = model.predict_proba(
             input_data
+        )[0]
+
+
+        # ------------------------------------------
+        # Get indices of top 3 predictions
+        # ------------------------------------------
+
+        top_indices = np.argsort(
+            probabilities
+        )[::-1][:3]
+
+
+        # ------------------------------------------
+        # Convert encoded predictions to crop names
+        # ------------------------------------------
+
+        top_crops = label_encoder.inverse_transform(
+            model.classes_[top_indices]
         )
 
+
+        # ------------------------------------------
+        # Create top 3 recommendations
+        # ------------------------------------------
+
+        recommendations = []
+
+        for crop, probability in zip(
+            top_crops,
+            probabilities[top_indices]
+        ):
+
+            recommendations.append({
+
+                "crop": crop,
+
+                "confidence": round(
+                    probability * 100,
+                    2
+                )
+
+            })
+
+
+        # ------------------------------------------
+        # Best crop confidence
+        # ------------------------------------------
+
         confidence = (
-            np.max(probabilities) * 100
+            probabilities[top_indices[0]] * 100
         )
 
 
@@ -211,7 +299,9 @@ def predict():
             "confidence": round(
                 confidence,
                 2
-            )
+            ),
+
+            "recommendations": recommendations
 
         })
 
@@ -228,6 +318,15 @@ def predict():
             f"An unexpected error occurred: {str(e)}"
 
         }), 500
+
+# ==========================================
+# Model comparison route
+# ==========================================
+
+@app.route("/model-comparison")
+def model_comparison_page():
+
+    return jsonify(model_comparison)
 
 
 # ==========================================
